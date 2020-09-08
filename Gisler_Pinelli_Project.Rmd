@@ -1,0 +1,134 @@
+---
+title: "Gisler_Pinelli_Analysis"
+author: "Marius Gisler"
+date: "8 9 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+###Data Loading
+df <- read.csv('C:/Users/mariu/OneDrive - Hochschule Luzern/Results/2020_Results.csv', header =TRUE, sep=";")
+df <- data.frame(df)
+
+```
+
+```{r setup, include=FALSE}
+###Data Inspection and Cleaning
+
+#head(df)
+colnames(df)
+#View(df)
+#str(df)
+#summary(df)
+
+
+### Rename NSA.Code to Nation
+names(df)[names(df) == "NSA.Code"] <- "Nation"
+names(df)[names(df) == "ï..Rank" ] <- "Rank"
+names(df)[names(df) == "Year.of.Birth" ] <- "Year_of_birth"
+
+names(df)[names(df) == "Distance..m." ] <- "Distance_in_meters"
+names(df)[names(df) == "Race.Points" ] <- "Race_points"
+names(df)[names(df) == "Race.Day" ] <- "Race_day"
+names(df)[names(df) == "FIS.Code" ] <- "FIS_code"
+names(df)[names(df) == "Last.Name" ] <- "Last_name"
+names(df)[names(df) == "First.Name" ] <- "First_name"
+
+
+### Change charachter format to date format for column Race_day
+df$Race_day <- as.factor(df$Race_day)
+df$Race_day <- as.Date(df$Race_day, "%d.%m.%Y")
+#head(df$Race_day)
+#str(df$Race_day)
+
+### Change chr format to time format for column Time
+#head(df$Time)
+
+
+### Change num format to time format for column Difference
+#head(df$Difference)
+
+
+###Add Age of Rider at Race
+df$year_of_race <- format(as.Date(df$Race_day, format="%d.%m.%Y"),"%Y")
+df$year_of_race <- as.integer(df$year_of_race)
+df$Age_of_rider <- df$year_of_race - df$Year_of_birth
+colnames(df)
+
+```
+
+
+```{r setup, include=FALSE}
+str(df)
+library(ggplot2)
+
+### All riders
+### Birthyears
+hist(df$Year_of_birth)
+
+### Ski Brands
+ggplot(data = df, aes(x=Ski)) +
+  geom_bar()
+
+### Nationalites
+ggplot(data = df, aes(x=Nation)) +
+  geom_bar()
+
+
+### Age of Riders
+ggplot(data = df, aes(x=Age_of_rider)) +
+  geom_bar()
+
+
+```
+
+```{r setup, include=FALSE}
+### Winners
+
+library(dplyr)
+df_winner <- filter(df, df$Rank == 1)
+
+### Ski Brands
+ggplot(data = df_winner, aes(x=Ski)) +
+  geom_bar()
+
+### Nationalites
+ggplot(data = df_winner, aes(x=Nation)) +
+  geom_bar()
+
+### Age of Riders
+ggplot(data = df_winner, aes(x=Age_of_rider)) +
+  geom_bar()
+
+### Riders
+ggplot(data = df_winner, aes(x=Last_name)) +
+  geom_bar()
+
+
+```
+
+
+```{r setup, include=FALSE}
+### Podium
+
+library(dplyr)
+df_podium <- filter(df, df$Rank <4)
+
+### Ski Brands
+ggplot(data = df_podium, aes(x=Ski)) +
+  geom_bar()
+
+### Nationalites
+ggplot(data = df_podium, aes(x=Nation)) +
+  geom_bar()
+
+### Age of Riders
+ggplot(data = df_podium, aes(x=Age_of_rider)) +
+  geom_bar()
+
+### Riders
+ggplot(data = df_podium, aes(x=Last_name)) +
+  geom_bar()
+
+
+```
