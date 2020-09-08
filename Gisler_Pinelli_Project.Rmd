@@ -4,6 +4,11 @@ author: "Marius Gisler"
 date: "8 9 2020"
 output: html_document
 ---
+```{r setup, include=FALSE}
+library(ggplot2)
+library(dplyr)
+
+```
 
 ```{r setup, include=FALSE}
 ###Data Loading
@@ -58,9 +63,6 @@ df$Age_of_rider <- df$year_of_race - df$Year_of_birth
 
 
 ```{r setup, include=FALSE}
-str(df)
-library(ggplot2)
-
 ### All riders
 ### Birthyears
 hist(df$Year_of_birth)
@@ -73,18 +75,20 @@ ggplot(data = df, aes(x=Ski)) +
 ggplot(data = df, aes(x=Nation)) +
   geom_bar()
 
-
 ### Age of Riders
 ggplot(data = df, aes(x=Age_of_rider)) +
   geom_bar()
 
+### Number of Riders
+df_podium <- filter(df, df$Rank <4)
+
+ggplot(data = df_often, aes(x=Last_name)) +
+  geom_bar()
 
 ```
 
 ```{r setup, include=FALSE}
 ### Winners
-
-library(dplyr)
 df_winner <- filter(df, df$Rank == 1)
 
 ### Ski Brands
@@ -103,14 +107,11 @@ ggplot(data = df_winner, aes(x=Age_of_rider)) +
 ggplot(data = df_winner, aes(x=Last_name)) +
   geom_bar()
 
-
 ```
 
 
 ```{r setup, include=FALSE}
 ### Podium
-
-library(dplyr)
 df_podium <- filter(df, df$Rank <4)
 
 ### Ski Brands
@@ -129,5 +130,7 @@ ggplot(data = df_podium, aes(x=Age_of_rider)) +
 ggplot(data = df_podium, aes(x=Last_name)) +
   geom_bar()
 
+head(df)
+head(df)
 
 ```
