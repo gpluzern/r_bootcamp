@@ -26,7 +26,6 @@ colnames(df)
 names(df)[names(df) == "NSA.Code"] <- "Nation"
 names(df)[names(df) == "ï..Rank" ] <- "Rank"
 names(df)[names(df) == "Year.of.Birth" ] <- "Year_of_birth"
-
 names(df)[names(df) == "Distance..m." ] <- "Distance_in_meters"
 names(df)[names(df) == "Race.Points" ] <- "Race_points"
 names(df)[names(df) == "Race.Day" ] <- "Race_day"
@@ -53,7 +52,7 @@ df$Race_day <- as.Date(df$Race_day, "%d.%m.%Y")
 df$year_of_race <- format(as.Date(df$Race_day, format="%d.%m.%Y"),"%Y")
 df$year_of_race <- as.integer(df$year_of_race)
 df$Age_of_rider <- df$year_of_race - df$Year_of_birth
-colnames(df)
+#colnames(df)
 
 ```
 
