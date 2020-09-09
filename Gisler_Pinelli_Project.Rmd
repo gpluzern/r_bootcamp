@@ -12,9 +12,8 @@ library(dplyr)
 
 ```{r setup, include=FALSE}
 ###Data Loading
-df <- read.csv('C:/Users/mariu/OneDrive - Hochschule Luzern/Results/2020_Results.csv', header =TRUE, sep=";")
+df <- read.csv('C:/Users/mariu/OneDrive - Hochschule Luzern/r_bootcamp/2020_Results.csv', header =TRUE, sep=";")
 df <- data.frame(df)
-
 ```
 
 ```{r setup, include=FALSE}
@@ -38,6 +37,13 @@ names(df)[names(df) == "FIS.Code" ] <- "FIS_code"
 names(df)[names(df) == "Last.Name" ] <- "Last_name"
 names(df)[names(df) == "First.Name" ] <- "First_name"
 
+### Add Column Number_of_Participations
+occurence <- table(df$FIS_code)
+occurence <- as.data.frame(occurence)
+names(occurence)[names(occurence) == "Var1"] <- "FIS_code"
+names(occurence)[names(occurence) == "Freq"] <- "Number_of_participations"
+df <- merge(df,occurence,by="FIS_code")
+
 
 ### Change charachter format to date format for column Race_day
 df$Race_day <- as.factor(df$Race_day)
@@ -46,11 +52,24 @@ df$Race_day <- as.Date(df$Race_day, "%d.%m.%Y")
 #str(df$Race_day)
 
 ### Change chr format to time format for column Time
-#head(df$Time)
+head(df$Time)
+str(df$Time)
+# View(df$Time)
+# 
+# df['newtime'] <- strptime(df$Time, "%M:%OS")
+# df$newtime # prints without fractional seconds
+# op <- options(digits.secs=3)
+
 
 
 ### Change num format to time format for column Difference
 #head(df$Difference)
+
+# str(df$Difference)
+# 
+# test <- strftime(df$Difference, format = "%OS")
+# 
+# ?strptime
 
 
 ###Add Age of Rider at Race
@@ -58,6 +77,8 @@ df$year_of_race <- format(as.Date(df$Race_day, format="%d.%m.%Y"),"%Y")
 df$year_of_race <- as.integer(df$year_of_race)
 df$Age_of_rider <- df$year_of_race - df$Year_of_birth
 #colnames(df)
+
+View(df)
 
 ```
 
@@ -107,6 +128,11 @@ ggplot(data = df_winner, aes(x=Age_of_rider)) +
 ggplot(data = df_winner, aes(x=Last_name)) +
   geom_bar()
 
+View(df_winner)
+
+df_second <- filter(df, df$Rank == 2)
+View(df_second)
+
 ```
 
 
@@ -130,7 +156,14 @@ ggplot(data = df_podium, aes(x=Age_of_rider)) +
 ggplot(data = df_podium, aes(x=Last_name)) +
   geom_bar()
 
-head(df)
-head(df)
+#df_participations <- filter(df, df$FIS_code <4)
+
+
+View(df)
+
+
+#assign occurence values to df by FIS Code
+
+
 
 ```
