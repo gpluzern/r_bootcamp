@@ -1,0 +1,25 @@
+Descriptive:
+
+
+Overall:
+Number of athletes / nation
+Average Age /nation
+Most participations
+
+
+
+Podium:
+Number of athletes / nation
+Average age
+
+Winner:
+Number of athletes / nation
+Average age
+
+
+
+Analytics:
+What are the characteristics of a Podium?
+What are the characteristics of a Winner?
+
+
