@@ -1,31 +1,40 @@
 ---
-title: "Gisler_Pinelli_Analysis"
-author: "Marius Gisler"
-date: "8 9 2020"
-output: html_document
+title: "Pinelli_Gisler"
+author: "Gianni Pinelli and Marius Gisler"
+date: "2 10 2020"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
-###Install Packages
 ```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+###Install Packages
+```{r}
 library(dplyr)
 library(tinytex)
 library(ggplot2)
 library(ggrepel)
 library(gridExtra)
-
+library(gganimate)
+library(gifski)
+library(av)
 ```
 
 ###Data Loading
 
-```{r setup, include=FALSE}
+```{r}
 getwd()
-df <- read.csv('../r_bootcamp/2020_Results.csv', header =TRUE, sep=";")
+df <- read.csv('C:/Users/mariu/OneDrive - Hochschule Luzern/r_bootcamp/2020_Results.csv', header =TRUE, sep=";")
 df <- data.frame(df)
 ```
 
 ###Data Cleaning
-
-```{r setup, include=FALSE}
+```{r}
 names(df)[names(df) == "NSA.Code"] <- "Nation"
 names(df)[names(df) == "ï..Rank" ] <- "Rank"
 names(df)[names(df) == "Year.of.Birth" ] <- "Year_of_birth"
@@ -38,11 +47,14 @@ names(df)[names(df) == "First.Name" ] <- "First_name"
 df$FIS_code <- as.factor(df$FIS_code)
 df$Race_day <- as.factor(df$Race_day)
 df$Race_day <- as.Date(df$Race_day, "%d.%m.%Y")
+df$Race_year <- format(df$Race_day,'%Y')
+df$Race_year <- as.numeric(df$Race_year)
+
 ```
 
 
 ###Add Columns
-```{r setup, include=FALSE}
+```{r}
 ###Number of participations
 df_part <- table(df$FIS_code)
 df_part <- as.data.frame(df_part)
@@ -118,7 +130,7 @@ df <- left_join(df, df_rank,by='FIS_code', keep=FALSE)
 
 
 ###Add Dataframes
-```{r setup, include=FALSE}
+```{r}
 ### Dataframe Podium
 df_podium <- filter(df, df$Rank <4)
 
@@ -141,7 +153,7 @@ df_participations <- df_participations[!duplicated(df_participations$FIS_code), 
 
 
 ###Data Visualisation: All athletes
-```{r setup, include=FALSE}
+```{r}
 df$Wins_per_Start_nation <- df$Number_of_wins_nation/df$Number_of_participations_Nation
 nations <- filter(df, df$Number_of_participations_Nation >24)
 
@@ -172,7 +184,7 @@ grid.arrange(plot_nations_1, plot_nations_2,plot_nations_3, ncol=1)
 
 
 ###Nations most participated
-```{r setup, include=FALSE}
+```{r}
 ### Nations number of Participants
 nations <- table(df$Nation)
 nations <- as.data.frame(nations)
@@ -199,7 +211,7 @@ ggplot(data = nations, aes(x=reorder(Nation, -Number_of_participations_Nation), 
 
 ###How sucessful is a nation?
 
-```{r setup, include=FALSE}
+```{r}
 df$Wins_per_Start_nation <- df$Number_of_wins_nation/df$Number_of_participations_Nation
 nations <- filter(df, df$Number_of_participations_Nation >24)
 
@@ -229,7 +241,7 @@ grid.arrange(plot_nations_1, plot_nations_2,plot_nations_3, ncol=1)
 
 ###How does the age structure looks?
 
-```{r setup, include=FALSE}
+```{r}
 
 ggplot(data = df, aes(x=Age_of_rider, y=Rank)) +
   geom_point()+
@@ -247,7 +259,7 @@ ggplot(data = df, aes(x=Age_of_rider, y=Rank)) +
 
 
 
-```{r setup, include=FALSE}
+```{r}
 age_average <- ggplot(data = df, aes(y=Age_of_rider))+
   geom_boxplot(color="black", fill="brown", alpha=0.2)+
   ylab("Age of all Athletes")+
@@ -283,7 +295,7 @@ grid.arrange(age_average, age_podium_average, age_winner_average, ncol=3)
 ### Athletes with more than 6 starts, what is the highest rank reached?
 
 
-```{r setup, include=FALSE}
+```{r}
 ggplot(df_participations, aes(y= Best_Rank, x = Number_of_participations)) + 
   geom_point(color = df_participations$Best_Rank, size = 3, show.legend = TRUE)+
   geom_label_repel(aes(label = Last_name),
@@ -301,7 +313,7 @@ ggplot(df_participations, aes(y= Best_Rank, x = Number_of_participations)) +
 ```
 
 
-```{r setup, include=FALSE}
+```{r}
 cor(df$Rank, df$Bib)
 ggplot(df, aes(x=Rank, y=Bib))+
   geom_point()+
@@ -316,7 +328,7 @@ summary(lm.rank_1)
 ```
 
 
-```{r setup, include=FALSE}
+```{r}
 cor(df$Rank, df$Number_of_participations)
 ggplot(df, aes(x=Rank, y=Number_of_participations))+
   geom_point()+
@@ -331,7 +343,7 @@ summary(lm.rank_2)
 ```
 
 
-```{r setup, include=FALSE}
+```{r}
 cor(df$Rank, df$Number_of_participations)
 ggplot(df, aes(x=Rank, y=Number_of_participations))+
   geom_point()+
@@ -346,7 +358,7 @@ summary(lm.rank_2)
 ```
 
 
-```{r setup, include=FALSE}
+```{r}
 ggplot(data = nations, mapping = aes(x=reorder(Nation, Rank), y = Rank, fill=Nation))+
   geom_boxplot()+
   theme(axis.title.x=element_blank(),
@@ -361,7 +373,7 @@ summary(lm_nations)
 
 
 ### 10n fold cross validation
-```{r setup, include=FALSE}
+```{r}
 r.squared.simple <- c()
 r.squared.few <- c()
 set.seed(12)
@@ -412,5 +424,26 @@ print(mean_rsquared_lm_few)
 ```
 
 
+```{r}
+
+theme_set(theme_bw())
+
+country <- c("SUI" = "red", "USA" = "blue", "ITA" = "green", "NOR" = "grey", "SLO" = "yellow", "LIE" = "orange", 
+             "CAN" = "black", "AUT" = "pink", "SWE" = "beige", "FRA" = "brown", "GER" = "cyan" )
+p <- ggplot(
+  nations, 
+  aes(x = Rank , y=Bib, size = Rank , colour = Nation)
+) +
+  geom_point(show.legend = TRUE, alpha = 0.7) +
+  scale_color_viridis_d() +
+  scale_size(range = c(2, 10)) +
+  scale_x_log10() +
+  labs(x = "Rank", y = "Bib") 
+p
 
 
+p + transition_time(Race_year) +
+  labs(title = "Year: {frame_time}")
+
+
+```
