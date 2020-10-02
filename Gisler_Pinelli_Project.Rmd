@@ -12,8 +12,10 @@ library(dplyr)
 
 ```{r setup, include=FALSE}
 ###Data Loading
-df <- read.csv('C:/Users/mariu/OneDrive - Hochschule Luzern/r_bootcamp/2020_Results.csv', header =TRUE, sep=";")
+df <- read.csv('https://raw.githubusercontent.com/gpluzern/r_bootcamp/master/2020_Results.csv?token=ALJMYDAKLZHYUJCCN4RW3N27LDBJY', header =TRUE, sep=";")
 df <- data.frame(df)
+
+df_1 <- read.csv('https://github.com/gpluzern/r_bootcamp/blob/master/Year_Downhill_Results.xlsx', header = TRUE, sep = ":")
 ```
 
 ```{r setup, include=FALSE}
@@ -103,7 +105,7 @@ ggplot(data = df, aes(x=Age_of_rider)) +
 ### Number of Riders
 df_podium <- filter(df, df$Rank <4)
 
-ggplot(data = df_often, aes(x=Last_name)) +
+ggplot(data = df_podium, aes(x=Last_name)) +
   geom_bar()
 
 ```
