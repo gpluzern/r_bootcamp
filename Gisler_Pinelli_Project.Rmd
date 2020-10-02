@@ -11,9 +11,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-
-
-###Install Packages
+### Install Packages
 ```{r}
 library(dplyr)
 library(tinytex)
@@ -25,15 +23,14 @@ library(gifski)
 library(av)
 ```
 
-###Data Loading
 
-```{r}
+```{r, include=FALSE}
 getwd()
 df <- read.csv('C:/Users/mariu/OneDrive - Hochschule Luzern/r_bootcamp/2020_Results.csv', header =TRUE, sep=";")
 df <- data.frame(df)
 ```
 
-###Data Cleaning
+### Data Cleaning
 ```{r}
 names(df)[names(df) == "NSA.Code"] <- "Nation"
 names(df)[names(df) == "ï..Rank" ] <- "Rank"
@@ -53,7 +50,7 @@ df$Race_year <- as.numeric(df$Race_year)
 ```
 
 
-###Add Columns
+### Add Additional Columns
 ```{r}
 ###Number of participations
 df_part <- table(df$FIS_code)
@@ -125,11 +122,13 @@ df_rank <- df_rank[!duplicated(df_rank$FIS_code), ]
 names(df_rank)[names(df_rank) == "Rank"] <- "Best_Rank"
 df_rank$Last_name <- NULL
 df <- left_join(df, df_rank,by='FIS_code', keep=FALSE)
+
+head(df)
 ```
 
 
 
-###Add Dataframes
+### Add additional Dataframes
 ```{r}
 ### Dataframe Podium
 df_podium <- filter(df, df$Rank <4)
@@ -146,44 +145,9 @@ df_participations <- filter(df, df$Number_of_participations >6)
 df_participations <- df_participations[order(df_participations$Rank),]
 df_participations <- df_participations[!duplicated(df_participations$FIS_code), ]
 
-
 ```
 
-
-
-
-###Data Visualisation: All athletes
-```{r}
-df$Wins_per_Start_nation <- df$Number_of_wins_nation/df$Number_of_participations_Nation
-nations <- filter(df, df$Number_of_participations_Nation >24)
-
-plot_nations_1 <- ggplot(data = nations, aes(x=reorder(Nation, -Number_of_participations_Nation), y=Number_of_participations_Nation)) +
-  theme_minimal()+
-  geom_bar(stat="identity", width=0.5, position = "dodge", aes(fill = Nation),show.legend = FALSE)+
-  ylab("Participations")+
-  xlab("Nation")
-
-plot_nations_2 <- ggplot(data = nations, aes(x=reorder(Nation, -Number_of_wins_nation), y=Number_of_wins_nation)) +
-  theme_minimal()+
-  geom_bar(stat="identity", width=0.5, position = "dodge", aes(fill = Nation),show.legend = FALSE)+
-  ylab("Number of Wins")+
-  xlab("Nation")
-
-plot_nations_3 <- ggplot(data = nations, aes(x=reorder(Nation, -Wins_per_Start_nation), y=Wins_per_Start_nation)) +
-  theme_minimal()+
-  geom_bar(stat="identity", width=0.5, position = "dodge", aes(fill = Nation), show.legend = FALSE)+
-  ylab("Wins per Start")+
-  xlab("Nation")+ 
-  scale_y_continuous(labels = scales::percent)
-
-grid.arrange(plot_nations_1, plot_nations_2,plot_nations_3, ncol=1)
-
-
-```
-
-
-
-###Nations most participated
+### Data Visualisation: Nations most participated
 ```{r}
 ### Nations number of Participants
 nations <- table(df$Nation)
@@ -191,26 +155,23 @@ nations <- as.data.frame(nations)
 names(nations)[names(nations) == "Var1"] <- "Nation"
 names(nations)[names(nations) == "Freq"] <- "Number_of_participations_Nation"
 
-#upper 25% of Nations with participations
 nations <- filter(nations, nations$Number_of_participations_Nation >9)
 ggplot(data = nations, aes(x=reorder(Nation, -Number_of_participations_Nation), y=Number_of_participations_Nation)) +
   theme_minimal()+
-  geom_bar(stat="identity", width=0.5)+
-  ggtitle("Comparison of Nations")+
+  geom_bar(stat="identity", width=0.5, aes(fill = Nation))+
+  ggtitle("Number of Participations per Nation")+
   xlab("Nation")+
   ylab("Number of Participations")+
-  geom_text(aes(label=Number_of_participations_Nation), position=position_dodge(width=0.9), vjust=-0.25)
+  geom_text(aes(label=Number_of_participations_Nation), position=position_dodge(width=0.9), vjust=-0.25)+
+  theme(axis.title.y=element_blank(),
+        axis.text.y=element_blank(),
+        axis.ticks.y=element_blank())
   
   
 ```
 
 
-
-
-#Sucess of nations
-
-###How sucessful is a nation?
-
+### Data Visualisation: Comparison participations, wins and wins per number of participations 
 ```{r}
 df$Wins_per_Start_nation <- df$Number_of_wins_nation/df$Number_of_participations_Nation
 nations <- filter(df, df$Number_of_participations_Nation >24)
@@ -239,10 +200,14 @@ grid.arrange(plot_nations_1, plot_nations_2,plot_nations_3, ncol=1)
 
 ```
 
-###How does the age structure looks?
+Austria has participated the most, however the Swiss won more races. Interestingly the Norwegians have a better rating in Wins divided by number of participations, this might indicate that the small norwegian team is strong or has had a lucky day by wining a race.
+
+
+
+
+### Data Visualisation: Age and Rank over time
 
 ```{r}
-
 ggplot(data = df, aes(x=Age_of_rider, y=Rank)) +
   geom_point()+
   coord_cartesian(ylim = c(1, 80))+
@@ -255,9 +220,7 @@ ggplot(data = df, aes(x=Age_of_rider, y=Rank)) +
 ```
 
 
-### Age Comparison
-
-
+### Data Visualisation: Age Comparison
 
 ```{r}
 age_average <- ggplot(data = df, aes(y=Age_of_rider))+
@@ -290,9 +253,12 @@ age_winner_average
 grid.arrange(age_average, age_podium_average, age_winner_average, ncol=3)
 
 ```
+The age of the winning athletes and the athletes on the podium seem to be higher than the overall age of all athletes.
 
 
-### Athletes with more than 6 starts, what is the highest rank reached?
+
+
+### Data Visualisation: Athletes with more than 6 starts, what is the highest rank reached?
 
 
 ```{r}
@@ -312,50 +278,7 @@ ggplot(df_participations, aes(y= Best_Rank, x = Number_of_participations)) +
 
 ```
 
-
-```{r}
-cor(df$Rank, df$Bib)
-ggplot(df, aes(x=Rank, y=Bib))+
-  geom_point()+
-  stat_smooth(method = 'lm', col = 'red')+
-  ylab("Bib")+
-  xlab("Rank")+
-  ggtitle('Correlation between Rank and Bib')+
-  theme_minimal()
-lm.rank_1 <- lm(Rank ~ Bib, data = df)
-summary(lm.rank_1)
-
-```
-
-
-```{r}
-cor(df$Rank, df$Number_of_participations)
-ggplot(df, aes(x=Rank, y=Number_of_participations))+
-  geom_point()+
-  stat_smooth(method = 'lm', col = 'red')+
-  ylab("Number of Participations")+
-  xlab("Rank")+
-  ggtitle('Correlation between Rank and Bib')+
-  theme_minimal()
-lm.rank_2 <- lm(Rank ~ Number_of_participations, data = df)
-summary(lm.rank_2)
-
-```
-
-
-```{r}
-cor(df$Rank, df$Number_of_participations)
-ggplot(df, aes(x=Rank, y=Number_of_participations))+
-  geom_point()+
-  stat_smooth(method = 'lm', col = 'red')+
-  ylab("Number of Participations")+
-  xlab("Rank")+
-  ggtitle('Correlation between Rank and Bib')+
-  theme_minimal()
-lm.rank_2 <- lm(Rank ~ Number_of_participations, data = df)
-summary(lm.rank_2)
-
-```
+### Data Analyisis: How do the nations perform on average?
 
 
 ```{r}
@@ -372,7 +295,45 @@ summary(lm_nations)
 
 
 
-### 10n fold cross validation
+### Data Analyisis: Are there correlations between Rank and Bib?
+
+
+```{r}
+cor(df$Rank, df$Bib)
+ggplot(df, aes(x=Rank, y=Bib))+
+  geom_point()+
+  stat_smooth(method = 'lm', col = 'red')+
+  ylab("Bib")+
+  xlab("Rank")+
+  ggtitle('Correlation between Rank and Bib')+
+  theme_minimal()
+lm.rank_1 <- lm(Rank ~ Bib, data = df)
+summary(lm.rank_1)
+
+```
+
+
+### Data Analyisis: Are there correlations between Rank and Number of Participations?
+
+
+```{r}
+cor(df$Rank, df$Number_of_participations)
+ggplot(df, aes(x=Rank, y=Number_of_participations))+
+  geom_point()+
+  stat_smooth(method = 'lm', col = 'red')+
+  ylab("Number of Participations")+
+  xlab("Rank")+
+  ggtitle('Correlation between Rank and Bib')+
+  theme_minimal()
+lm.rank_2 <- lm(Rank ~ Number_of_participations, data = df)
+summary(lm.rank_2)
+
+```
+
+
+### Comparison of models: Which one is better?
+
+## A 10n fold cross validation is applied and the R-squards are compared.
 ```{r}
 r.squared.simple <- c()
 r.squared.few <- c()
@@ -385,7 +346,7 @@ for(i in 1:10){
   df_test <- df[-train,]
   
   
-  ## complex model ##
+  ## model 1
   ## 2) fit the model with "train" data
   lm.all <- lm(Rank ~ Bib + Number_of_participations, data = df)
   ##
@@ -399,7 +360,7 @@ for(i in 1:10){
   
   
   
-  ## simple model ##
+  ## model 2
   ## 2) fit the model with "train" data
   lm.few <- lm(Rank ~ Bib, data = df_train)
   ##
@@ -423,6 +384,13 @@ print(mean_rsquared_lm_few)
 
 ```
 
+The r-squared seem to do not differ significantly.
+
+
+
+### Own Chapter
+
+## Application of gganimate, gifski, and av.
 
 ```{r}
 
@@ -444,6 +412,5 @@ p
 
 p + transition_time(Race_year) +
   labs(title = "Year: {frame_time}")
-
 
 ```
